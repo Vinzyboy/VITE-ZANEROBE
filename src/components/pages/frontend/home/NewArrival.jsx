@@ -4,46 +4,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { imgPath } from "@/components/helpers/functions-general";
 import CardItem from "./CardItem";
+import { NewArrivalArray } from "./new-arrival-data";
 
 const NewArrival = () => {
-  const NewArrivalArray = [
-    {
-      img1: "na-card-a1.jpg",
-      img2: "na-card-a2.jpg",
-      title: "lorem ipsum",
-      price: "7,700 PHP",
-    },
-    {
-      img1: "na-card-a2.jpg",
-      img2: "na-card-a1.jpg",
-      title: "lorem ipsum",
-      price: "7,700 PHP",
-    },
-    {
-      img1: "na-card-a1.jpg",
-      img2: "na-card-a2.jpg",
-      title: "lorem ipsum",
-      price: "7,700 PHP",
-    },
-    {
-      img1: "na-card-a2.jpg",
-      img2: "na-card-a1.jpg",
-      title: "lorem ipsum",
-      price: "7,700 PHP",
-    },
-    {
-      img1: "na-card-a1.jpg",
-      img2: "na-card-a2.jpg",
-      title: "lorem ipsum",
-      price: "7,700 PHP",
-    },
-    {
-      img1: "na-card-a2.jpg",
-      img2: "na-card-a1.jpg",
-      title: "lorem ipsum",
-      price: "7,700 PHP",
-    },
-  ];
+  
 
   var settings = {
     dots: true,
