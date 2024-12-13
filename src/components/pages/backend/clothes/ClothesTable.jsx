@@ -1,6 +1,5 @@
 import React from "react";
 import TableLoader from "../partials/TableLoader";
-import Pills from "../partials/Pills";
 import {
   Archive,
   ArchiveRestore,
@@ -13,40 +12,55 @@ import SpinnerTable from "../partials/spinners/SpinnerTable";
 import IconNoData from "../partials/IconNoData";
 import IconServerError from "../partials/IconServerError";
 import { StoreContext } from "@/components/store/storeContext";
-import {
-  setIsAdd,
-  setIsConfirm,
-  setIsDelete,
-  setIsEdit,
-} from "@/components/store/storeAction";
-import ModalDelete from "../partials/modals/ModalDelete";
-import ModalConfirm from "../partials/modals/ModalConfirm";
+import { setIsAdd, setIsArchive, setIsDelete, setIsRestore } from "@/components/store/storeAction";
 
-const ClothesTable = (setItemEdit) => {
+import useQueryData from "@/components/custom-hook/useQueryData";
+import ModalArchive from "@/components/partials/modal/ModalArchive";
+import ModalRestore from "@/components/partials/modal/ModalRestore";
+import Status from "@/components/partials/Status";
+import ModalDelete from "@/components/partials/modal/ModalDelete";
+
+const ClothesTable = ({ setItemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
+  const [id, setIsId] = React.useState(null);
 
-  let counter = 1;
-
+  const handleAdd = (item) => {
+    dispatch(setIsAdd(true));
+    setItemEdit(item);
+  };
   const handleEdit = (item) => {
     dispatch(setIsAdd(true));
     setItemEdit(item);
   };
-  const handleAdd = () => {
-    dispatch(setIsAdd(true));
-  };
-  const handleDelete = () => {
+  const handleDelete = (item) => {
     dispatch(setIsDelete(true));
+    setIsId(item.clothes_aid);
   };
-  const handleRestore = () => {
-    dispatch(setIsConfirm(true));
+  const handleRestore = (item) => {
+    dispatch(setIsRestore(true));
+    setIsId(item.clothes_aid);
   };
-  const handleArchive = () => {
-    dispatch(setIsConfirm(true));
+  const handleArchive = (item) => {
+    dispatch(setIsArchive(true));
+    setIsId(item.clothes_aid);
   };
+
+  const {
+    isLoading,
+    isFetching,
+    error,
+    data: result,
+  } = useQueryData(
+    `/v2/clothes`, // endpoint
+    "get", // method
+    "clothes"
+  );
+
+  let counter = 1;
   return (
     <>
       <div className="p-4 bg-secondary rounded-md mt-10 border border-line relative">
-        {/* <SpinnerTable /> */}
+        {!isLoading || (isFetching && <SpinnerTable />)}
         <div className="table-wrapper custom-scroll">
           {/* <TableLoader count={40} cols={10} /> */}
           <table>
@@ -55,72 +69,98 @@ const ClothesTable = (setItemEdit) => {
                 <th>#</th>
                 <th>Status</th>
                 <th className="w-[33%]">Title</th>
-                <th >Price</th>
+                <th>Category</th>
+                <th>Level</th>
                 <th></th>
               </tr>
             </thead>
 
             <tbody>
-              {/* <tr>
-                        <td colSpan={100}>
-                          <IconNoData />
-                        </td>
-                      </tr> 
-               <tr>
-                        <td colSpan={100}>
-                          <IconServerError />
-                        </td>
-                      </tr>  */}
-              {Array.from(Array(6).keys()).map((i) => (
-                <tr key={i}>
-                  <td>{counter++}.</td>
-                  <td>
-                    <Pills />
-                  </td>
-                  <td>Tshirt 1</td>
-
-                  <td>
-                    <ul className="table-action">
-                      {true ? (
-                        <>
-                          <li>
-                            <button className="tooltip" data-tooltip="View">
-                              <FileVideo onClick={() => handleView(item)} />
-                            </button>
-                          </li>
-                          <li>
-                            <button className="tooltip" data-tooltip="Edit">
-                              <FilePenLine onClick={() => handleAdd()} />
-                            </button>
-                          </li>
-                          <li>
-                            <button className="tooltip" data-tooltip="Archive">
-                              <Archive onClick={() => handleArchive()} />
-                            </button>
-                          </li>
-                        </>
-                      ) : (
-                        <>
-                          <li>
-                            <button className="tooltip" data-tooltip="Restore">
-                              <ArchiveRestore onClick={() => handleRestore()} />
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="tooltip"
-                              data-tooltip="Delete"
-                              onClick={handleDelete}
-                            >
-                              <Trash2 />
-                            </button>
-                          </li>
-                        </>
-                      )}
-                    </ul>
+              {((isLoading && !isFetching) || result?.data.length === 0) && (
+                <tr>
+                  <td colSpan="100%">
+                    {isLoading ? (
+                      <TableLoader count={30} cols={6} />
+                    ) : (
+                      <IconNoData />
+                    )}
                   </td>
                 </tr>
-              ))}
+              )}
+
+              {error && (
+                <tr>
+                  <td colSpan="100%">
+                    <IconServerError />
+                  </td>
+                </tr>
+              )}
+              {result?.count > 0 &&
+                result.data.map((item, key) => (
+                  <tr key={key}>
+                    <td>{counter++}.</td>
+                    <td>
+                      {item.clothes_is_active === 1 ? (
+                        <Status text="Active" />
+                      ) : (
+                        <Status text="Inactive" />
+                      )}
+                    </td>
+                    <td>{item.clothes_title}</td>
+                    <td className="capitalize">P {item.clothes_price}</td>
+                    <td className="capitalize">{item.clothes_size}</td>
+                    <td className="capitalize">{item.clothes_category_id}</td>
+
+                    <td>
+                      <ul className="table-action">
+                        {item.clothes_is_active === 1 ? (
+                          <>
+                            <li>
+                              <button className="tooltip" data-tooltip="View">
+                                <FileVideo onClick={() => handleAdd(item)} />
+                              </button>
+                            </li>
+                            <li>
+                              <button className="tooltip" data-tooltip="Edit">
+                                <FilePenLine onClick={() => handleEdit(item)} />
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="tooltip"
+                                data-tooltip="Archive"
+                              >
+                                <Archive onClick={() => handleArchive(item)} />
+                              </button>
+                            </li>
+                          </>
+                        ) : (
+                          <>
+                            <li>
+                              <button
+                                className="tooltip"
+                                data-tooltip="Restore"
+                              >
+                                <ArchiveRestore
+                                  onClick={() => handleRestore(item)}
+                                />
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="tooltip"
+                                data-tooltip="Delete"
+                                onClick={() => handleDelete(item)}
+                              >
+                                <Trash2 />
+                              </button>
+                            </li>
+                          </>
+                        )}
+                      </ul>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
 
@@ -128,9 +168,28 @@ const ClothesTable = (setItemEdit) => {
         </div>
       </div>
 
-      {store.isView && <ModalViewMovie movieInfo={movieInfo} />}
-      {store.isDelete && <ModalDelete />}
-      {store.isConfirm && <ModalConfirm />}
+
+      {store.isDelete && (
+        <ModalDelete
+          setIsDelete={setIsDelete}
+          mysqlApiDelete={`/v2/clothes/${id}`}
+          queryKey={"clothes"}
+        />
+      )}
+      {store.isArchive && (
+        <ModalArchive
+          setIsArchive={setIsArchive}
+          mysqlEndpoint={`/v2/clothes/active/${id}`}
+          queryKey={"clothes"}
+        />
+      )}
+      {store.isRestore && (
+        <ModalRestore
+          setIsRestore={setIsRestore}
+          mysqlEndpoint={`/v2/clothes/active/${id}`}
+          queryKey={"clothes"}
+        />
+      )}
     </>
   );
 };

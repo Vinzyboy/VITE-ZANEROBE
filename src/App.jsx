@@ -4,19 +4,23 @@ import { StoreProvider } from "./components/store/storeContext";
 import Category from "./components/pages/backend/category/Category";
 import Clothes from "./components/pages/backend/clothes/Clothes";
 import ProductInfo from "./components/pages/frontend/product-info/ProductInfo";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const App = () => {
+  const queryClient = new QueryClient();
   return (
-    <StoreProvider>
-      <Router>
-        <Routes>
-          <Route index element={<Home />} />
-          <Route path="/product/:slug" element={<ProductInfo />} />
-          <Route path="/admin/category" element={<Category />} />
-          <Route path="/admin/clothes" element={<Clothes />} />
-        </Routes>
-      </Router>
-    </StoreProvider>
+    <QueryClientProvider client={queryClient}>
+      <StoreProvider>
+        <Router>
+          <Routes>
+            <Route index element={<Home />} />
+            <Route path="/product/:slug" element={<ProductInfo />} />
+            <Route path="/admin/category" element={<Category />} />
+            <Route path="/admin/clothes" element={<Clothes />} />
+          </Routes>
+        </Router>
+      </StoreProvider>
+    </QueryClientProvider>
   );
 };
 

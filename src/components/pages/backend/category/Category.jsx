@@ -1,35 +1,33 @@
-import React from 'react'
-import Header from '../partials/Header';
-import Footer from '../partials/Footer';
-import Searchbar from '../partials/Searchbar';
-import { Plus } from 'lucide-react';
-// import AdvertisementTable from './CategoryTable';
-import { StoreContext } from '@/components/store/storeContext';
-import { setIsAdd } from '@/components/store/storeAction';
-import ModalValidation from '../partials/modals/ModalValidation';
-import ModalError from '../partials/modals/ModalError';
-import ToastSuccess from '../partials/ToastSuccess';
-import ModalAddAdvertisement from './ModalAddCategory';
-import CategoryTable from './CategoryTable';
-import SideNavigation from '../partials/SideNavigation';
-import ModalAddCategory from './ModalAddCategory';
+import React from "react";
+import SideNavigation from "../partials/SideNavigation";
+import Header from "../partials/Header";
+import Footer from "../partials/Footer";
+import Searchbar from "../partials/Searchbar";
+import { Plus } from "lucide-react";
+import { StoreContext } from "@/components/store/storeContext";
+import { setIsAdd } from "@/components/store/storeAction";
+import ModalValidation from "../partials/modals/ModalValidation";
+import ModalError from "../partials/modals/ModalError";
+
+import CategoryTable from "./CategoryTable";
+import ModalAddCategory from "./ModalAddCategory";
+import ToastSuccess from "../partials/ToastSuccess";
 
 const Category = () => {
-      const { dispatch, store } = React.useContext(StoreContext);
+  const { dispatch, store } = React.useContext(StoreContext);
+  const [isCategoryEdit, setIsCategoryEdit] = React.useState(null);
 
-      const handleAdd = () => {
-        dispatch(setIsAdd(true));
-      };
+  const handleAdd = () => {
+    dispatch(setIsAdd(true));
+    setIsCategoryEdit(null);
+  };
   return (
     <>
       <section className="layout-main ">
         <div className="layout-division ">
           <SideNavigation menu="category" />
           <main>
-            <Header
-              title="Category"
-              subtitle="Manage Zanerobe Category"
-            />
+            <Header title="Category" subtitle="Manage Kiosk Category" />
             <div className="p-8">
               <div className="flex justify-between items-center">
                 <Searchbar />
@@ -39,7 +37,7 @@ const Category = () => {
                 </button>
               </div>
 
-              <CategoryTable />
+              <CategoryTable setIsCategoryEdit={setIsCategoryEdit} />
             </div>
 
             <Footer />
@@ -49,9 +47,9 @@ const Category = () => {
       {store.validate && <ModalValidation />}
       {store.error && <ModalError />}
       {store.success && <ToastSuccess />}
-      {store.isAdd && <ModalAddCategory />}
+      {store.isAdd && <ModalAddCategory isCategoryEdit={isCategoryEdit} />}
     </>
   );
-}
+};
 
-export default Category
+export default Category;

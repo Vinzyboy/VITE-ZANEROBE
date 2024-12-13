@@ -13,7 +13,8 @@ const ProductInfo = () => {
   return (
     <div>
       <Header />
-      <div className="product-info">
+      <section className="h-[50vh] bg-black bg-[url(http://localhost/vite-zanerobe/public/img/slider2.jpg)] "></section>
+      <section className="product-info">
         <div className="container">
           <div className="grid grid-cols-[1fr,400px] gap-5 mt-10">
             <main>
@@ -76,7 +77,7 @@ const ProductInfo = () => {
             </aside>
           </div>
         </div>
-      </div>
+      </section>
       <Footer />
     </div>
   );
