@@ -6,31 +6,38 @@ require '../../core/functions.php';
 require 'functions.php';
 // use needed classes
 require '../../models/clothes/Clothes.php';
-// get payload
+
 
 // check database connection
-
 $conn = null;
 $conn = checkDbConnection();
 // make instance of classes
 $clothes = new Clothes($conn);
+$response = new Response();
 // get payload
 $body = file_get_contents("php://input");
 $data = json_decode($body, true);
-// get $_GET data
 // validate api key
 if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-    //checkApiKey();
-    if (array_key_exists("clothesid", $_GET)) {
-        // check data
-        checkPayload($data);
-        $clothes->clothes_aid = $_GET['clothesid'];
-        $clothes->clothes_is_active = trim($data["isActive"]);
-        checkId($clothes->clothes_aid);
-        $query = checkActive($clothes);
-        http_response_code(200);
-        returnSuccess($clothes, "clothes", $query);
+    checkApiKey();
+    checkPayload($data);
+
+    $clothes->clothes_search = $data['searchValue'];
+
+    http_response_code(200);
+    if ($data['isFilter']) {
+        $clothes->clothes_is_active = checkIndex($data, 'statusFilter');
+        if ($clothes->clothes_search != '') {
+            $query = checkFilterActiveSearch($clothes);
+            getQueriedData(($query));
+        }
+        $query = checkFilterActive($clothes);
+        getQueriedData(($query));
     }
+
+    $query = checkSearch($clothes);
+    http_response_code(200);
+    getQueriedData(($query));
     // return 404 error if endpoint not available
     checkEndpoint();
 }

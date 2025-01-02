@@ -1,7 +1,8 @@
 import React from "react";
-import { FaSearch } from "react-icons/fa";
-import { setError, setIsSearch, setMessage } from "../../store/StoreAction";
+import { FaList, FaSearch } from "react-icons/fa";
+
 import { MdOutlineSearch } from "react-icons/md";
+import { setError, setIsSearch, setMessage } from "../store/storeAction";
 
 const SearchBar = ({
   search,
@@ -39,23 +40,29 @@ const SearchBar = ({
       onSubmit={(e) => {
         handleSubmit(e);
       }}
-      className="search-box"
+      className="search-box flex items-center gap-2"
     >
-      <div className="search">
+      <div className="search relative">
         <input
           id="search"
           type="search"
           placeholder="Search here . . ."
           ref={search}
           onChange={(e) => handleChange(e)}
+          className="p-1.5 bg-secondary border border-line rounded-md outline-none pl-8 
+                    placeholder:opacity-30 placeholder:text-sm w-[250] block focus:border-accent"
         />
-        <div className="search-icon">
+        <div className="search-icon absolute bottom-2 left-2">
           <MdOutlineSearch />
         </div>
       </div>
       {/* {store.isSearch && (
-        <p>Result: {isFetching ? "Searching..." : result?.[0].count}</p>
+        
       )} */}
+      <p className="leading-none flex items-center gap-2">
+        <FaList />
+        <span>{isFetching ? "Searching..." : result?.pages[0].count}</span>
+      </p>
     </form>
   );
 };
